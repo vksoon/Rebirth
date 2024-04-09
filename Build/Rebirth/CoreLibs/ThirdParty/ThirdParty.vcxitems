@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <ItemsProjectGuid>{3e2cc709-a3c4-42b0-8d5b-5355f33ac3f7}</ItemsProjectGuid>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\ThirdParty\DirectXCollision.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\ThirdParty\DirectXColors.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\ThirdParty\DirectXMath.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\ThirdParty\DirectXMathCommon.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\ThirdParty\DirectXPackedVector.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\ThirdParty\dxcapi.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\ThirdParty\stb_image.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\ThirdParty\stb_image_write.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\ThirdParty\stb_truetype.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\ThirdParty\tinyddsloader.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\ThirdParty\tiny_gltf.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\ThirdParty\tiny_obj_loader.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)..\..\..\Code\ThirdParty\DirectXCollision.inl" />
+    <None Include="$(MSBuildThisFileDirectory)..\..\..\Code\ThirdParty\DirectXMathConvert.inl" />
+    <None Include="$(MSBuildThisFileDirectory)..\..\..\Code\ThirdParty\DirectXMathMatrix.inl" />
+    <None Include="$(MSBuildThisFileDirectory)..\..\..\Code\ThirdParty\DirectXMathMisc.inl" />
+    <None Include="$(MSBuildThisFileDirectory)..\..\..\Code\ThirdParty\DirectXMathVector.inl" />
+    <None Include="$(MSBuildThisFileDirectory)..\..\..\Code\ThirdParty\DirectXPackedVector.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\Code\ThirdParty\stb_vorbis.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\Code\ThirdParty\utility_common.cpp" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,70 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33801.468
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Rebirth CoreLibs", "Rebirth CoreLibs", "{DBFA0877-C544-4DD9-8DF9-FBA08172651C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Rebirth Plugin", "Rebirth Plugin", "{E8D3E7CE-1E35-4D21-B31E-E059B04C976E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{4C067644-33DA-47E2-8FAD-D01EB469A5BF}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CoreLibs", "CoreLibs\CoreLibs.vcxproj", "{A634B274-6D3A-41E2-8403-1795EBD28F62}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Framework", "Framework", "{B974E7FA-29C6-4131-9ADB-527015EF0F96}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shaders", "Shaders", "{77E68C41-F5CF-448C-81A9-AFCCEC547FBE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ThirdParty", "ThirdParty", "{C650223C-221E-4613-B17F-5326C6A6F7F7}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Foundation", "Foundation\Foundation.vcxitems", "{26BFBD9E-4897-4229-8670-21B22971EF5D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ThirdParty", "ThirdParty\ThirdParty.vcxitems", "{3E2CC709-A3C4-42B0-8D5B-5355F33AC3F7}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RenderHardwareKernel", "GraphicsKernel\GraphicsKernel.vcxitems", "{6EF2E623-6197-47C7-B989-3784A1CB3E3C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Application", "Framework\Framework.vcxitems", "{95D102CE-FCCA-49C0-AAE7-EA03B22B02D8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A634B274-6D3A-41E2-8403-1795EBD28F62}.Debug|x64.ActiveCfg = Debug|x64
+		{A634B274-6D3A-41E2-8403-1795EBD28F62}.Debug|x64.Build.0 = Debug|x64
+		{A634B274-6D3A-41E2-8403-1795EBD28F62}.Debug|x86.ActiveCfg = Debug|Win32
+		{A634B274-6D3A-41E2-8403-1795EBD28F62}.Debug|x86.Build.0 = Debug|Win32
+		{A634B274-6D3A-41E2-8403-1795EBD28F62}.Release|x64.ActiveCfg = Release|x64
+		{A634B274-6D3A-41E2-8403-1795EBD28F62}.Release|x64.Build.0 = Release|x64
+		{A634B274-6D3A-41E2-8403-1795EBD28F62}.Release|x86.ActiveCfg = Release|Win32
+		{A634B274-6D3A-41E2-8403-1795EBD28F62}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A634B274-6D3A-41E2-8403-1795EBD28F62} = {DBFA0877-C544-4DD9-8DF9-FBA08172651C}
+		{B974E7FA-29C6-4131-9ADB-527015EF0F96} = {DBFA0877-C544-4DD9-8DF9-FBA08172651C}
+		{77E68C41-F5CF-448C-81A9-AFCCEC547FBE} = {DBFA0877-C544-4DD9-8DF9-FBA08172651C}
+		{C650223C-221E-4613-B17F-5326C6A6F7F7} = {DBFA0877-C544-4DD9-8DF9-FBA08172651C}
+		{26BFBD9E-4897-4229-8670-21B22971EF5D} = {B974E7FA-29C6-4131-9ADB-527015EF0F96}
+		{3E2CC709-A3C4-42B0-8D5B-5355F33AC3F7} = {C650223C-221E-4613-B17F-5326C6A6F7F7}
+		{6EF2E623-6197-47C7-B989-3784A1CB3E3C} = {B974E7FA-29C6-4131-9ADB-527015EF0F96}
+		{95D102CE-FCCA-49C0-AAE7-EA03B22B02D8} = {B974E7FA-29C6-4131-9ADB-527015EF0F96}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4DF4F89F-9B9A-436D-A3BE-06EEFA27BCDF}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Foundation\Foundation.vcxitems*{26bfbd9e-4897-4229-8670-21b22971ef5d}*SharedItemsImports = 9
+		ThirdParty\ThirdParty.vcxitems*{3e2cc709-a3c4-42b0-8d5b-5355f33ac3f7}*SharedItemsImports = 9
+		GraphicsKernel\GraphicsKernel.vcxitems*{6ef2e623-6197-47c7-b989-3784a1cb3e3c}*SharedItemsImports = 9
+		Framework\Framework.vcxitems*{95d102ce-fcca-49c0-aae7-ea03b22b02d8}*SharedItemsImports = 9
+		Foundation\Foundation.vcxitems*{a634b274-6d3a-41e2-8403-1795ebd28f62}*SharedItemsImports = 4
+		GraphicsKernel\GraphicsKernel.vcxitems*{a634b274-6d3a-41e2-8403-1795ebd28f62}*SharedItemsImports = 4
+		ThirdParty\ThirdParty.vcxitems*{a634b274-6d3a-41e2-8403-1795ebd28f62}*SharedItemsImports = 4
+	EndGlobalSection
+EndGlobal
