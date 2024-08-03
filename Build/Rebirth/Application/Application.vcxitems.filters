@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="AppEvents">
+      <UniqueIdentifier>{0a004e08-8cd3-4b8a-a6fb-5a5dbf7a78b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platforms">
+      <UniqueIdentifier>{1fe834fb-0f5d-4a09-987b-10e0afe1cf7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platforms\MSW">
+      <UniqueIdentifier>{03aabb62-16a0-4761-81f5-cc81cd3148e0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\CoreLibs\Application\AppEvent.h">
+      <Filter>AppEvents</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\CoreLibs\Application\AppMouseEvent.h">
+      <Filter>AppEvents</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\CoreLibs\Application\AppKeyboardEvent.h">
+      <Filter>AppEvents</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\CoreLibs\Application\AppDisplay.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\CoreLibs\Application\Application.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\CoreLibs\Application\ApplicationSupports.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\CoreLibs\Application\AppWindow.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\CoreLibs\Application\MSW\ApplicationImplMsw.h">
+      <Filter>Platforms\MSW</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\CoreLibs\Application\MSW\ApplicationMsw.h">
+      <Filter>Platforms\MSW</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\CoreLibs\Application\Display.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\CoreLibs\Application\AppLauncher.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\Code\CoreLibs\Application\AppKeyboardEvent.cpp">
+      <Filter>AppEvents</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\Code\CoreLibs\Application\Application.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\Code\CoreLibs\Application\AppWindow.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\Code\CoreLibs\Application\MSW\ApplicationImplMsw.cpp">
+      <Filter>Platforms\MSW</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\Code\CoreLibs\Application\MSW\ApplicationMsw.cpp">
+      <Filter>Platforms\MSW</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\Code\CoreLibs\Application\Display.cpp" />
+  </ItemGroup>
+</Project>

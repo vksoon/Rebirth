@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <ItemsProjectGuid>{3b4ebdd9-a7bf-44b0-86cb-673d59ded965}</ItemsProjectGuid>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\ThirdParty\DirectXCollision.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\ThirdParty\DirectXColors.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\ThirdParty\DirectXMath.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\ThirdParty\DirectXMathCommon.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\ThirdParty\DirectXPackedVector.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)..\..\..\Code\ThirdParty\DirectXCollision.inl" />
+    <None Include="$(MSBuildThisFileDirectory)..\..\..\Code\ThirdParty\DirectXMathConvert.inl" />
+    <None Include="$(MSBuildThisFileDirectory)..\..\..\Code\ThirdParty\DirectXMathMatrix.inl" />
+    <None Include="$(MSBuildThisFileDirectory)..\..\..\Code\ThirdParty\DirectXMathMisc.inl" />
+    <None Include="$(MSBuildThisFileDirectory)..\..\..\Code\ThirdParty\DirectXMathVector.inl" />
+    <None Include="$(MSBuildThisFileDirectory)..\..\..\Code\ThirdParty\DirectXPackedVector.inl" />
+  </ItemGroup>
+</Project>

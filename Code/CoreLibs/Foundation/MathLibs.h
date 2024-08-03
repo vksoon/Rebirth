@@ -1,24 +1,9 @@
 #pragma once
-
 #include "Prerequisites.h"
 
-#if __has_include("DirectXMath.h")
-// In this case, DirectXMath is coming from Windows SDK.
-//	It is better to use this on Windows as some Windows libraries could depend on the same 
-//	DirectXMath headers
-#include <DirectXMath.h>
-#include <DirectXPackedVector.h>
-#include <DirectXCollision.h>
-#else
-// In this case, DirectXMath is coming from supplied source code
-//	On platforms that don't have Windows SDK, the source code for DirectXMath is provided
-//	as part of the engine utilities
 #include "DirectXMath.h"
 #include "DirectXPackedVector.h"
 #include "DirectXCollision.h"
-#endif
-
-RB_NAMESPACE_BEGIN
 
 using Vec2i = DirectX::XMINT2;
 using Vec3i = DirectX::XMINT3;
@@ -53,7 +38,9 @@ using Vector = DirectX::XMVECTOR;
 using namespace DirectX;
 using namespace DirectX::PackedVector;
 
-class BP_CORE_API Math
+RB_NAMESPACE_BEGIN
+
+class RB_CORE_API RMath
 {
 public:
 	static constexpr uint32 GetNextPowerOfTwo(uint32 x)

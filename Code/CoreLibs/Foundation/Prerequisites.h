@@ -53,3 +53,6 @@
 
 // Commonly used standard headers
 #include "StandardHeaders.h"
+
+#include "StringBase.h"
+#include "MathLibs.h"

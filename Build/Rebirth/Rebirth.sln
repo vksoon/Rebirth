@@ -7,7 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Rebirth CoreLibs", "Rebirth
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Rebirth Plugin", "Rebirth Plugin", "{E8D3E7CE-1E35-4D21-B31E-E059B04C976E}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{4C067644-33DA-47E2-8FAD-D01EB469A5BF}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{4C067644-33DA-47E2-8FAD-D01EB469A5BF}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CoreLibs", "CoreLibs\CoreLibs.vcxproj", "{A634B274-6D3A-41E2-8403-1795EBD28F62}"
 EndProject
@@ -17,13 +17,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shaders", "Shaders", "{77E6
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ThirdParty", "ThirdParty", "{C650223C-221E-4613-B17F-5326C6A6F7F7}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Foundation", "Foundation\Foundation.vcxitems", "{26BFBD9E-4897-4229-8670-21B22971EF5D}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Foundation", "Foundation\Foundation.vcxitems", "{DC32B91B-E0D8-4EA5-8E8D-C9EF96FDFFDA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ThirdParty", "ThirdParty\ThirdParty.vcxitems", "{3E2CC709-A3C4-42B0-8D5B-5355F33AC3F7}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RenderHardwareKernel", "RenderHardwareKernel\RenderHardwareKernel.vcxitems", "{02E97F56-0641-4E92-91B7-7984BE08032D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RenderHardwareKernel", "GraphicsKernel\GraphicsKernel.vcxitems", "{6EF2E623-6197-47C7-B989-3784A1CB3E3C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ThirdParty", "ThirdParty\ThirdParty.vcxitems", "{3B4EBDD9-A7BF-44B0-86CB-673D59DED965}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Application", "Framework\Framework.vcxitems", "{95D102CE-FCCA-49C0-AAE7-EA03B22B02D8}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Application", "Application\Application.vcxitems", "{28B6541E-9B15-4888-BE79-8A2B93F9B6B8}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "D3D12RenderHardwareKernel", "Plugins\D3D12RenderHardwareKernel\D3D12RenderHardwareKernel.vcxproj", "{A650CB6B-E7EF-4DFB-BDB7-E8AA41949DE5}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StartUpRebirth", "..\..\Examples\StartUpRebirth\StartUpRebirth.vcxproj", "{C753E1B0-D7D8-4F4E-B9A9-5B48B137A1A6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +45,22 @@ Global
 		{A634B274-6D3A-41E2-8403-1795EBD28F62}.Release|x64.Build.0 = Release|x64
 		{A634B274-6D3A-41E2-8403-1795EBD28F62}.Release|x86.ActiveCfg = Release|Win32
 		{A634B274-6D3A-41E2-8403-1795EBD28F62}.Release|x86.Build.0 = Release|Win32
+		{A650CB6B-E7EF-4DFB-BDB7-E8AA41949DE5}.Debug|x64.ActiveCfg = Debug|x64
+		{A650CB6B-E7EF-4DFB-BDB7-E8AA41949DE5}.Debug|x64.Build.0 = Debug|x64
+		{A650CB6B-E7EF-4DFB-BDB7-E8AA41949DE5}.Debug|x86.ActiveCfg = Debug|Win32
+		{A650CB6B-E7EF-4DFB-BDB7-E8AA41949DE5}.Debug|x86.Build.0 = Debug|Win32
+		{A650CB6B-E7EF-4DFB-BDB7-E8AA41949DE5}.Release|x64.ActiveCfg = Release|x64
+		{A650CB6B-E7EF-4DFB-BDB7-E8AA41949DE5}.Release|x64.Build.0 = Release|x64
+		{A650CB6B-E7EF-4DFB-BDB7-E8AA41949DE5}.Release|x86.ActiveCfg = Release|Win32
+		{A650CB6B-E7EF-4DFB-BDB7-E8AA41949DE5}.Release|x86.Build.0 = Release|Win32
+		{C753E1B0-D7D8-4F4E-B9A9-5B48B137A1A6}.Debug|x64.ActiveCfg = Debug|x64
+		{C753E1B0-D7D8-4F4E-B9A9-5B48B137A1A6}.Debug|x64.Build.0 = Debug|x64
+		{C753E1B0-D7D8-4F4E-B9A9-5B48B137A1A6}.Debug|x86.ActiveCfg = Debug|Win32
+		{C753E1B0-D7D8-4F4E-B9A9-5B48B137A1A6}.Debug|x86.Build.0 = Debug|Win32
+		{C753E1B0-D7D8-4F4E-B9A9-5B48B137A1A6}.Release|x64.ActiveCfg = Release|x64
+		{C753E1B0-D7D8-4F4E-B9A9-5B48B137A1A6}.Release|x64.Build.0 = Release|x64
+		{C753E1B0-D7D8-4F4E-B9A9-5B48B137A1A6}.Release|x86.ActiveCfg = Release|Win32
+		{C753E1B0-D7D8-4F4E-B9A9-5B48B137A1A6}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -50,21 +70,27 @@ Global
 		{B974E7FA-29C6-4131-9ADB-527015EF0F96} = {DBFA0877-C544-4DD9-8DF9-FBA08172651C}
 		{77E68C41-F5CF-448C-81A9-AFCCEC547FBE} = {DBFA0877-C544-4DD9-8DF9-FBA08172651C}
 		{C650223C-221E-4613-B17F-5326C6A6F7F7} = {DBFA0877-C544-4DD9-8DF9-FBA08172651C}
-		{26BFBD9E-4897-4229-8670-21B22971EF5D} = {B974E7FA-29C6-4131-9ADB-527015EF0F96}
-		{3E2CC709-A3C4-42B0-8D5B-5355F33AC3F7} = {C650223C-221E-4613-B17F-5326C6A6F7F7}
-		{6EF2E623-6197-47C7-B989-3784A1CB3E3C} = {B974E7FA-29C6-4131-9ADB-527015EF0F96}
-		{95D102CE-FCCA-49C0-AAE7-EA03B22B02D8} = {B974E7FA-29C6-4131-9ADB-527015EF0F96}
+		{DC32B91B-E0D8-4EA5-8E8D-C9EF96FDFFDA} = {B974E7FA-29C6-4131-9ADB-527015EF0F96}
+		{02E97F56-0641-4E92-91B7-7984BE08032D} = {B974E7FA-29C6-4131-9ADB-527015EF0F96}
+		{3B4EBDD9-A7BF-44B0-86CB-673D59DED965} = {C650223C-221E-4613-B17F-5326C6A6F7F7}
+		{28B6541E-9B15-4888-BE79-8A2B93F9B6B8} = {B974E7FA-29C6-4131-9ADB-527015EF0F96}
+		{A650CB6B-E7EF-4DFB-BDB7-E8AA41949DE5} = {E8D3E7CE-1E35-4D21-B31E-E059B04C976E}
+		{C753E1B0-D7D8-4F4E-B9A9-5B48B137A1A6} = {4C067644-33DA-47E2-8FAD-D01EB469A5BF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4DF4F89F-9B9A-436D-A3BE-06EEFA27BCDF}
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		Foundation\Foundation.vcxitems*{26bfbd9e-4897-4229-8670-21b22971ef5d}*SharedItemsImports = 9
-		ThirdParty\ThirdParty.vcxitems*{3e2cc709-a3c4-42b0-8d5b-5355f33ac3f7}*SharedItemsImports = 9
-		GraphicsKernel\GraphicsKernel.vcxitems*{6ef2e623-6197-47c7-b989-3784a1cb3e3c}*SharedItemsImports = 9
-		Framework\Framework.vcxitems*{95d102ce-fcca-49c0-aae7-ea03b22b02d8}*SharedItemsImports = 9
+		RenderHardwareKernel\RenderHardwareKernel.vcxitems*{02e97f56-0641-4e92-91b7-7984be08032d}*SharedItemsImports = 9
+		Application\Application.vcxitems*{28b6541e-9b15-4888-be79-8a2b93f9b6b8}*SharedItemsImports = 9
+		ThirdParty\ThirdParty.vcxitems*{3b4ebdd9-a7bf-44b0-86cb-673d59ded965}*SharedItemsImports = 9
+		Application\Application.vcxitems*{a634b274-6d3a-41e2-8403-1795ebd28f62}*SharedItemsImports = 4
 		Foundation\Foundation.vcxitems*{a634b274-6d3a-41e2-8403-1795ebd28f62}*SharedItemsImports = 4
-		GraphicsKernel\GraphicsKernel.vcxitems*{a634b274-6d3a-41e2-8403-1795ebd28f62}*SharedItemsImports = 4
+		RenderHardwareKernel\RenderHardwareKernel.vcxitems*{a634b274-6d3a-41e2-8403-1795ebd28f62}*SharedItemsImports = 4
 		ThirdParty\ThirdParty.vcxitems*{a634b274-6d3a-41e2-8403-1795ebd28f62}*SharedItemsImports = 4
+		Foundation\Foundation.vcxitems*{a650cb6b-e7ef-4dfb-bdb7-e8aa41949de5}*SharedItemsImports = 4
+		RenderHardwareKernel\RenderHardwareKernel.vcxitems*{a650cb6b-e7ef-4dfb-bdb7-e8aa41949de5}*SharedItemsImports = 4
+		ThirdParty\ThirdParty.vcxitems*{a650cb6b-e7ef-4dfb-bdb7-e8aa41949de5}*SharedItemsImports = 4
+		Foundation\Foundation.vcxitems*{dc32b91b-e0d8-4ea5-8e8d-c9ef96fdffda}*SharedItemsImports = 9
 	EndGlobalSection
 EndGlobal

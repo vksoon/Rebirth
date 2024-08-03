@@ -2,8 +2,9 @@
 #include "Prerequisites.h"
 #include "EnumClassFlags.h"
 
-RB_NAMESPACE_BEGIN_EX(RHK)
+RB_NAMESPACE_BEGIN
 
+// Entities
 class RBuffer;
 class RCommandQueue;
 class RCommandBuffer;
@@ -13,21 +14,32 @@ class RDescriptor;
 class RDescriptorPool;
 class RDescriptorSet;
 class RFence;
-class RFrameBuffer;
 class RMemory;
 class RPipelineLayout;
 class RPipeline;
 class RQueryPool;
 class RTexture;
 
-static const uint16 REMAINING_ARRAY_LAYERS = 0;
-static const uint16 REMAINING_MIP_LEVELS = 0;
-static const uint16 WHOLE_SIZE = 0;
-static const uint32 WHOLE_DEVICE_GROUP = 0;
+// Types
+typedef uint32_t MemoryType;
+typedef uint16_t Dim_t;
+typedef uint8_t Mip_t;
+typedef uint8_t Sample_t;
+
+// Aliases
+static const Dim_t REMAINING_ARRAY_LAYERS = 0; // only for "arraySize"
+static const Mip_t REMAINING_MIP_LEVELS = 0; // only for "mipNum"
+static const Dim_t WHOLE_SIZE = 0; // only for "Dim_t" and "size"
+static const uint32 ALL_SAMPLES = 0; // only for "sampleMask"
+static const uint32 ONE_VIEWPORT = 0; // only for "viewportNum"
 static const bool VARIABLE_DESCRIPTOR_NUM = true;
 static const bool DESCRIPTOR_ARRAY = true;
+static const bool PARTIALLY_BOUND = true;
 
-typedef uint32 RMemoryType;
+//===============================================================================================================================
+// Common
+//===============================================================================================================================
+#pragma region [ Common ]
 
 enum class EResult : uint8
 {
@@ -37,7 +49,7 @@ enum class EResult : uint8
 	OUT_OF_MEMORY,
 	UNSUPPORTED,
 	DEVICE_LOST,
-	SWAPCHAIN_RESIZE,
+	OUT_OF_DATE, // VK only: swap chain is out of date
 
 	MAX_NUM
 };
@@ -61,6 +73,216 @@ enum class EGraphicsAPI : uint8
 	MAX_NUM
 };
 
+enum class EFormat : uint8
+{
+	UNKNOWN,
+
+	// 8-bit
+	R8_UNORM,
+	R8_SNORM,
+	R8_UINT,
+	R8_SINT,
+
+	RG8_UNORM,
+	RG8_SNORM,
+	RG8_UINT,
+	RG8_SINT,
+
+	BGRA8_UNORM,
+	BGRA8_SRGB,
+
+	RGBA8_UNORM,
+	RGBA8_SNORM,
+	RGBA8_UINT,
+	RGBA8_SINT,
+	RGBA8_SRGB,
+
+	// 16-bit
+	R16_UNORM,
+	R16_SNORM,
+	R16_UINT,
+	R16_SINT,
+	R16_SFLOAT,
+
+	RG16_UNORM,
+	RG16_SNORM,
+	RG16_UINT,
+	RG16_SINT,
+	RG16_SFLOAT,
+
+	RGBA16_UNORM,
+	RGBA16_SNORM,
+	RGBA16_UINT,
+	RGBA16_SINT,
+	RGBA16_SFLOAT,
+
+	// 32-bit
+	R32_UINT,
+	R32_SINT,
+	R32_SFLOAT,
+
+	RG32_UINT,
+	RG32_SINT,
+	RG32_SFLOAT,
+
+	RGB32_UINT,
+	RGB32_SINT,
+	RGB32_SFLOAT,
+
+	RGBA32_UINT,
+	RGBA32_SINT,
+	RGBA32_SFLOAT,
+
+	// Packed
+	R10_G10_B10_A2_UNORM,
+	R10_G10_B10_A2_UINT,
+	R11_G11_B10_UFLOAT,
+	R9_G9_B9_E5_UFLOAT,
+
+	// Block-compressed
+	BC1_RGBA_UNORM,
+	BC1_RGBA_SRGB,
+	BC2_RGBA_UNORM,
+	BC2_RGBA_SRGB,
+	BC3_RGBA_UNORM,
+	BC3_RGBA_SRGB,
+	BC4_R_UNORM,
+	BC4_R_SNORM,
+	BC5_RG_UNORM,
+	BC5_RG_SNORM,
+	BC6H_RGB_UFLOAT,
+	BC6H_RGB_SFLOAT,
+	BC7_RGBA_UNORM,
+	BC7_RGBA_SRGB,
+
+	// DEPTH_STENCIL_ATTACHMENT views
+	D16_UNORM,
+	D24_UNORM_S8_UINT,
+	D32_SFLOAT,
+	D32_SFLOAT_S8_UINT_X24,
+
+	// Depth-stencil specific SHADER_RESOURCE views
+	R24_UNORM_X8,
+	X24_R8_UINT,
+	X32_R8_UINT_X24,
+	R32_SFLOAT_X8_X24,
+
+	MAX_NUM
+};
+
+enum class EFormatSupportBits : uint8
+{
+	UNSUPPORTED				 = 0,
+	TEXTURE					 = RB_SET_BIT(0),
+	STORAGE_TEXTURE			 = RB_SET_BIT(1),
+	BUFFER					 = RB_SET_BIT(2),
+	STORAGE_BUFFER			 = RB_SET_BIT(3),
+	COLOR_ATTACHMENT		 = RB_SET_BIT(4),
+	DEPTH_STENCIL_ATTACHMENT = RB_SET_BIT(5),
+	VERTEX_BUFFER			 = RB_SET_BIT(6)
+};
+RB_ENUM_CLASS_FLAGS(EFormatSupportBits)
+
+enum class EStageBits : uint32
+{
+	// Special
+	ALL = 0,               // Lazy default for barriers
+	NONE = 0x7FFFFFFF,
+
+	// Graphics                                        // Invoked by "CmdDraw*"
+	INDEX_INPUT					= RB_SET_BIT(0),  //    Index buffer consumption
+	VERTEX_SHADER				= RB_SET_BIT(1),  //    Vertex shader
+	TESS_CONTROL_SHADER			= RB_SET_BIT(2),  //    Tessellation control (hull) shader
+	TESS_EVALUATION_SHADER		= RB_SET_BIT(3),  //    Tessellation evaluation (domain) shader
+	GEOMETRY_SHADER				= RB_SET_BIT(4),  //    Geometry shader
+	MESH_CONTROL_SHADER			= RB_SET_BIT(5),  //    Mesh control (task) shader
+	MESH_EVALUATION_SHADER		= RB_SET_BIT(6),  //    Mesh evaluation (amplification) shader
+	FRAGMENT_SHADER				= RB_SET_BIT(7),  //    Fragment (pixel) shader
+	DEPTH_STENCIL_ATTACHMENT	= RB_SET_BIT(8),  //    Depth-stencil R/W operations
+	COLOR_ATTACHMENT			= RB_SET_BIT(9),  //    Color R/W operations
+
+	// Compute Invoked by  "CmdDispatch*" (not Rays)
+	COMPUTE_SHADER				= RB_SET_BIT(10), //    Compute shader
+
+	// Ray tracing Invoked by "CmdDispatchRays"
+	RAYGEN_SHADER				= RB_SET_BIT(11), //    Ray generation shader
+	MISS_SHADER					= RB_SET_BIT(12), //    Miss shader
+	INTERSECTION_SHADER			= RB_SET_BIT(13), //    Intersection shader
+	CLOSEST_HIT_SHADER			= RB_SET_BIT(14), //    Closest hit shader
+	ANY_HIT_SHADER				= RB_SET_BIT(15), //    Any hit shader
+	CALLABLE_SHADER				= RB_SET_BIT(16), //    Callable shader
+
+	// Other stages
+	COPY						= RB_SET_BIT(17), // Invoked by "CmdCopy*", "CmdUpload*" and "CmdReadback*"
+	CLEAR_STORAGE				= RB_SET_BIT(18), // Invoked by "CmdClearStorage*"
+	ACCELERATION_STRUCTURE		= RB_SET_BIT(19), // Invoked by "Cmd*AccelerationStructure*"
+
+	// Modifiers
+	INDIRECT					= RB_SET_BIT(20), // Invoked by "Indirect" command (used as addition to other bits)
+
+	// Umbrella stages
+	TESSELLATION_SHADERS		= TESS_CONTROL_SHADER | TESS_EVALUATION_SHADER,
+	MESH_SHADERS				= MESH_CONTROL_SHADER |	MESH_EVALUATION_SHADER,
+	GRAPHICS_SHADERS			= VERTEX_SHADER | TESSELLATION_SHADERS | GEOMETRY_SHADER | MESH_SHADERS | FRAGMENT_SHADER,
+
+	// Invoked by "CmdDispatchRays"
+	RAY_TRACING_SHADERS			= RAYGEN_SHADER | MISS_SHADER | INTERSECTION_SHADER | CLOSEST_HIT_SHADER | ANY_HIT_SHADER |	CALLABLE_SHADER,
+
+	// Invoked by "CmdDraw*"
+	DRAW						= INDEX_INPUT | GRAPHICS_SHADERS | DEPTH_STENCIL_ATTACHMENT | COLOR_ATTACHMENT
+};
+
+struct RRect
+{
+	int16 X;
+	int16 Y;
+	Dim_t Width;
+	Dim_t Height;
+};
+
+struct RViewport
+{
+	float X;
+	float Y;
+	float Width;
+	float Height;
+	float DepthRangeMin;
+	float DepthRangeMax;
+};
+
+struct RColor32f
+{
+	float X, Y, Z, W;
+};
+
+struct RColor32ui
+{
+	uint32 X, Y, Z, W;
+};
+
+struct RColor32i
+{
+	int32 X, Y, Z, W;
+};
+
+struct RDepthStencil
+{
+	float Depth;
+	uint8 Stencil;
+};
+
+struct RSamplePosition
+{
+	int8 X, Y; // [-8; 7]
+};
+
+#pragma endregion
+
+//===============================================================================================================================
+// Creation
+//===============================================================================================================================
+#pragma region [ Creation ]
+
 enum class ECommandQueueType : uint8
 {
 	GRAPHICS,
@@ -73,6 +295,7 @@ enum class ECommandQueueType : uint8
 enum class EMemoryLocation : uint8
 {
 	DEVICE,
+	DEVICE_UPLOAD, // soft fallback to HOST_UPLOAD
 	HOST_UPLOAD,
 	HOST_READBACK,
 
@@ -147,7 +370,175 @@ enum class EDescriptorType : uint8
 	MAX_NUM
 };
 
-enum class EVertexStreamStepRate
+enum class ETextureUsageBits : uint16
+{
+	NONE = 0,
+	SHADER_RESOURCE			 = RB_SET_BIT(0),
+	SHADER_RESOURCE_STORAGE  = RB_SET_BIT(1),
+	COLOR_ATTACHMENT		 = RB_SET_BIT(2),
+	DEPTH_STENCIL_ATTACHMENT = RB_SET_BIT(3)
+};
+RB_ENUM_CLASS_FLAGS(ETextureUsageBits)
+
+enum class EBufferUsageBits : uint16
+{
+	NONE = 0,
+	SHADER_RESOURCE					  = RB_SET_BIT(0),
+	SHADER_RESOURCE_STORAGE			  = RB_SET_BIT(1),
+	VERTEX_BUFFER					  = RB_SET_BIT(2),
+	INDEX_BUFFER					  = RB_SET_BIT(3),
+	CONSTANT_BUFFER					  = RB_SET_BIT(4),
+	ARGUMENT_BUFFER					  = RB_SET_BIT(5),
+	RAY_TRACING_BUFFER				  = RB_SET_BIT(6),
+	ACCELERATION_STRUCTURE_BUILD_READ = RB_SET_BIT(7)
+};
+RB_ENUM_CLASS_FLAGS(EBufferUsageBits)
+
+enum class EResourceViewBits : uint8
+{
+	READONLY_DEPTH = RB_SET_BIT(0),
+	READONLY_STENCIL = RB_SET_BIT(1)
+};
+RB_ENUM_CLASS_FLAGS(EResourceViewBits)
+
+struct RTextureDesc
+{
+	ETextureType Type;
+	ETextureUsageBits UsageMask;
+	EFormat Format;
+	Dim_t Width;
+	Dim_t Height;
+	Dim_t Depth;
+	Mip_t MipNum;
+	Dim_t ArraySize;
+	Sample_t SampleNum;
+};
+
+struct RBufferDesc
+{
+	uint64 Size;
+	uint32 StructureStride;
+	EBufferUsageBits UsageMask;
+};
+
+struct RTexture1DViewDesc
+{
+	const RTexture* Texture;
+	ETexture1DViewType ViewType;
+	EFormat Format;
+	Mip_t MipOffset;
+	Mip_t MipNum;
+	Dim_t ArrayOffset;
+	Dim_t ArraySize;
+	EResourceViewBits Flags;
+};
+
+struct RTexture2DViewDesc
+{
+	const RTexture* Texture;
+	ETexture2DViewType ViewType;
+	EFormat Format;
+	Mip_t MipOffset;
+	Mip_t MipNum;
+	Dim_t ArrayOffset;
+	Dim_t ArraySize;
+	EResourceViewBits Flags;
+};
+
+struct RTexture3DViewDesc
+{
+	const RTexture* Texture;
+	ETexture3DViewType ViewType;
+	EFormat Format;
+	Mip_t MipOffset;
+	Mip_t MipNum;
+	Dim_t SliceOffset;
+	Dim_t SliceNum;
+	EResourceViewBits Flags;
+};
+
+struct RBufferViewDesc
+{
+	const RBuffer* Buffer;
+	EBufferViewType ViewType;
+	EFormat Format;
+	uint64 Offset;
+	uint64 Size;
+};
+
+struct RDescriptorPoolDesc
+{
+	uint32 DescriptorSetMaxNum;
+	uint32 SamplerMaxNum;
+	uint32 ConstantBufferMaxNum;
+	uint32 DynamicConstantBufferMaxNum;
+	uint32 TextureMaxNum;
+	uint32 StorageTextureMaxNum;
+	uint32 BufferMaxNum;
+	uint32 StorageBufferMaxNum;
+	uint32 StructuredBufferMaxNum;
+	uint32 StorageStructuredBufferMaxNum;
+	uint32 AccelerationStructureMaxNum;
+};
+
+#pragma endregion
+
+//===============================================================================================================================
+// Pipeline layout
+//===============================================================================================================================
+#pragma region [ Pipeline layout ]
+
+struct RPushConstantDesc
+{
+	uint32 RegisterIndex;
+	uint32 Size;
+	EStageBits ShaderStages;
+};
+
+struct RDescriptorRangeDesc
+{
+	uint32 BaseRegisterIndex;
+	uint32 DescriptorNum;
+	EDescriptorType DescriptorType;
+	EStageBits ShaderStages;
+	bool bIsDescriptorNumVariable;
+	bool bIsArray;
+};
+
+struct RDynamicConstantBufferDesc
+{
+	uint32 RegisterIndex;
+	EStageBits ShaderStages;
+};
+
+struct RDescriptorSetDesc
+{
+	uint32 RegisterSpace;
+	const RDescriptorRangeDesc* Ranges;
+	uint32 RangeNum;
+	const RDynamicConstantBufferDesc* DynamicConstantBuffers;
+	uint32 DynamicConstantBufferNum;
+	bool PartiallyBound;
+};
+
+struct RPipelineLayoutDesc
+{
+	const RDescriptorSetDesc* DescriptorSets;
+	const RPushConstantDesc* PushConstants;
+	uint32 DescriptorSetNum;
+	uint32 PushConstantNum;
+	EStageBits StageMask;
+	bool bIgnoreGlobalSPIRVOffsets;
+};
+
+#pragma endregion
+
+//===============================================================================================================================
+// Input assembly
+//===============================================================================================================================
+#pragma region [ Input assembly ]
+
+enum class EVertexStreamStepRate : uint8
 {
 	PER_VERTEX,
 	PER_INSTANCE,
@@ -155,40 +546,19 @@ enum class EVertexStreamStepRate
 	MAX_NUM
 };
 
-enum class ETextureLayout : uint8
+enum class EIndexType : uint8
 {
-	GENERAL,
-	COLOR_ATTACHMENT,
-	DEPTH_STENCIL,
-	DEPTH_STENCIL_READONLY,
-	DEPTH_READONLY,
-	STENCIL_READONLY,
-	SHADER_RESOURCE,
-	PRESENT,
-	UNKNOWN,
+	UINT16,
+	UINT32,
 
 	MAX_NUM
 };
 
-enum class EShaderStage : uint8
+enum class EPrimitiveRestart : uint8
 {
-	ALL,
-	VERTEX,
-	TESS_CONTROL,
-	TESS_EVALUATION,
-	GEOMETRY,
-	FRAGMENT,
-	COMPUTE,
-
-	MAX_NUM
-};
-
-enum class EBarrierDependency : uint8
-{
-	ALL_STAGES,
-	GRAPHICS_STAGE,
-	COMPUTE_STAGE,
-	COPY_STAGE,
+	DISABLED,
+	INDICES_UINT16,
+	INDICES_UINT32,
 
 	MAX_NUM
 };
@@ -209,6 +579,60 @@ enum class ETopology : uint8
 	MAX_NUM
 };
 
+
+struct RVertexAttributeVulkan
+{
+	uint32 Location;
+};
+
+struct RVertexAttributeD3D
+{
+	const char* SemanticName;
+	uint32 SemanticIndex;
+};
+
+struct RVertexAttributeDesc
+{
+	RVertexAttributeD3D D3D;
+	RVertexAttributeVulkan Vulkan;
+	uint32 Offset;
+	EFormat Format;
+	uint16 StreamIndex;
+};
+
+struct RVertexStreamDesc
+{
+	uint32 Stride;
+	uint16 BindingSlot;
+	EVertexStreamStepRate StepRate;
+};
+
+struct RInputAssemblyDesc
+{
+	const RVertexAttributeDesc* Attributes;
+	const RVertexStreamDesc* Streams;
+	uint8 AttributeNum;
+	uint8 StreamNum;
+	ETopology Topology;
+	uint8 TessControlPointNum;
+	EPrimitiveRestart PrimitiveRestart;
+};
+
+struct RVertexInputDesc
+{
+	const RVertexAttributeDesc* Attributes;
+	const RVertexStreamDesc* Streams;
+	uint8 AttributeNum;
+	uint8 StreamNum;
+};
+
+#pragma endregion
+
+//===============================================================================================================================
+// Rasterization
+//===============================================================================================================================
+#pragma region [ Rasterization ]
+
 enum class EFillMode : uint8
 {
 	SOLID,
@@ -225,6 +649,35 @@ enum class ECullMode : uint8
 
 	MAX_NUM
 };
+
+struct RRasterizationDesc
+{
+	uint32 ViewportNum;
+	float DepthBias;
+	float DepthBiasClamp;
+	float DepthBiasSlopeFactor;
+	EFillMode FillMode;
+	ECullMode CullMode;
+	bool FrontCounterClockwise;
+	bool DepthClamp;
+	bool AntialiasedLines; // Requires "isLineSmoothingSupported"
+	bool ConservativeRasterization; // Requires "conservativeRasterTier > 0"
+};
+
+struct RMultisampleDesc
+{
+	uint32 SampleMask;
+	Sample_t SampleNum;
+	bool AlphaToCoverage;
+	bool ProgrammableSampleLocations; // Requires "isProgrammableSampleLocationsSupported"
+};
+
+#pragma endregion
+
+//===============================================================================================================================
+// Output merger
+//===============================================================================================================================
+#pragma region [ Output merger ]
 
 enum class ELogicFunc : uint8
 {
@@ -313,152 +766,6 @@ enum class EBlendFunc : uint8
 	MAX_NUM
 };
 
-enum class EIndexType : uint8
-{
-	UINT16,
-	UINT32,
-
-	MAX_NUM
-};
-
-enum class EQueryType : uint8
-{
-	TIMESTAMP,
-	OCCLUSION,
-	PIPELINE_STATISTICS,
-
-	MAX_NUM
-};
-
-enum class EFilter : uint8
-{
-	NEAREST,
-	LINEAR,
-
-	MAX_NUM
-};
-
-enum class EFilterExt : uint8
-{
-	NONE,
-	MIN,
-	MAX,
-
-	MAX_NUM
-};
-
-enum class EAddressMode : uint8
-{
-	REPEAT,
-	MIRRORED_REPEAT,
-	CLAMP_TO_EDGE,
-	CLAMP_TO_BORDER,
-
-	MAX_NUM
-};
-
-enum class EBorderColor : uint8
-{
-	FLOAT_TRANSPARENT_BLACK,
-	FLOAT_OPAQUE_BLACK,
-	FLOAT_OPAQUE_WHITE,
-	INT_TRANSPARENT_BLACK,
-	INT_OPAQUE_BLACK,
-	INT_OPAQUE_WHITE,
-
-	MAX_NUM
-};
-
-enum class EFormat : uint8
-{
-	UNKNOWN,
-
-	R8_UNORM,
-	R8_SNORM,
-	R8_UINT,
-	R8_SINT,
-
-	RG8_UNORM,
-	RG8_SNORM,
-	RG8_UINT,
-	RG8_SINT,
-
-	BGRA8_UNORM,
-	BGRA8_SRGB,
-
-	RGBA8_UNORM,
-	RGBA8_SNORM,
-	RGBA8_UINT,
-	RGBA8_SINT,
-	RGBA8_SRGB,
-
-	R16_UNORM,
-	R16_SNORM,
-	R16_UINT,
-	R16_SINT,
-	R16_SFLOAT,
-
-	RG16_UNORM,
-	RG16_SNORM,
-	RG16_UINT,
-	RG16_SINT,
-	RG16_SFLOAT,
-
-	RGBA16_UNORM,
-	RGBA16_SNORM,
-	RGBA16_UINT,
-	RGBA16_SINT,
-	RGBA16_SFLOAT,
-
-	R32_UINT,
-	R32_SINT,
-	R32_SFLOAT,
-
-	RG32_UINT,
-	RG32_SINT,
-	RG32_SFLOAT,
-
-	RGB32_UINT,
-	RGB32_SINT,
-	RGB32_SFLOAT,
-
-	RGBA32_UINT,
-	RGBA32_SINT,
-	RGBA32_SFLOAT,
-
-	R10_G10_B10_A2_UNORM,
-	R10_G10_B10_A2_UINT,
-	R11_G11_B10_UFLOAT,
-	R9_G9_B9_E5_UFLOAT,
-
-	BC1_RGBA_UNORM,
-	BC1_RGBA_SRGB,
-	BC2_RGBA_UNORM,
-	BC2_RGBA_SRGB,
-	BC3_RGBA_UNORM,
-	BC3_RGBA_SRGB,
-	BC4_R_UNORM,
-	BC4_R_SNORM,
-	BC5_RG_UNORM,
-	BC5_RG_SNORM,
-	BC6H_RGB_UFLOAT,
-	BC6H_RGB_SFLOAT,
-	BC7_RGBA_UNORM,
-	BC7_RGBA_SRGB,
-
-	D16_UNORM,
-	D24_UNORM_S8_UINT,
-	D32_SFLOAT,
-	D32_SFLOAT_S8_UINT_X24,
-
-	R24_UNORM_X8,
-	X24_R8_UINT,
-	X32_R8_UINT_X24,
-	R32_SFLOAT_X8_X24,
-
-	MAX_NUM
-};
-
 enum class EAttachmentContentType : uint8
 {
 	COLOR,
@@ -469,92 +776,6 @@ enum class EAttachmentContentType : uint8
 	MAX_NUM
 };
 
-enum class ERenderPassBeginFlag : uint8
-{
-	NONE,
-	SKIP_FRAME_BUFFER_CLEAR,
-
-	MAX_NUM
-};
-
-enum class EPrimitiveRestart : uint8
-{
-	DISABLED,
-	INDICES_UINT16,
-	INDICES_UINT32,
-
-	MAX_NUM
-};
-
-enum class ETextureUsageBits : uint16
-{
-	NONE = 0,
-	SHADER_RESOURCE = RB_SET_BIT(0),
-	SHADER_RESOURCE_STORAGE = RB_SET_BIT(1),
-	COLOR_ATTACHMENT = RB_SET_BIT(2),
-	DEPTH_STENCIL_ATTACHMENT = RB_SET_BIT(3)
-};
-RB_ENUM_CLASS_FLAGS(ETextureUsageBits)
-
-enum class EBufferUsageBits : uint16
-{
-	NONE = 0,
-	SHADER_RESOURCE = RB_SET_BIT(0),
-	SHADER_RESOURCE_STORAGE = RB_SET_BIT(1),
-	VERTEX_BUFFER = RB_SET_BIT(2),
-	INDEX_BUFFER = RB_SET_BIT(3),
-	CONSTANT_BUFFER = RB_SET_BIT(4),
-	ARGUMENT_BUFFER = RB_SET_BIT(5),
-};
-RB_ENUM_CLASS_FLAGS(EBufferUsageBits)
-
-enum class EAccessBits : uint16
-{
-	UNKNOWN = 0,
-	VERTEX_BUFFER = RB_SET_BIT(0),
-	INDEX_BUFFER = RB_SET_BIT(1),
-	CONSTANT_BUFFER = RB_SET_BIT(2),
-	ARGUMENT_BUFFER = RB_SET_BIT(3),
-	SHADER_RESOURCE = RB_SET_BIT(4),
-	SHADER_RESOURCE_STORAGE = RB_SET_BIT(5),
-	COLOR_ATTACHMENT = RB_SET_BIT(6),
-	DEPTH_STENCIL_WRITE = RB_SET_BIT(7),
-	DEPTH_STENCIL_READ = RB_SET_BIT(8),
-	COPY_SOURCE = RB_SET_BIT(9),
-	COPY_DESTINATION = RB_SET_BIT(10),
-};
-RB_ENUM_CLASS_FLAGS(EAccessBits)
-
-enum class EPipelineLayoutShaderStageBits : uint16
-{
-	NONE = 0,
-	VERTEX = RB_SET_BIT(1),
-	TESS_CONTROL = RB_SET_BIT(2),
-	TESS_EVALUATION = RB_SET_BIT(3),
-	GEOMETRY = RB_SET_BIT(4),
-	FRAGMENT = RB_SET_BIT(5),
-	COMPUTE = RB_SET_BIT(6),
-
-	ALL_GRAPHICS = VERTEX | TESS_CONTROL | TESS_EVALUATION | GEOMETRY | FRAGMENT
-};
-RB_ENUM_CLASS_FLAGS(EPipelineLayoutShaderStageBits)
-
-enum class EPipelineStatsBits : uint16
-{
-	INPUT_ASSEMBLY_VERTICES = RB_SET_BIT(0),
-	INPUT_ASSEMBLY_PRIMITIVES = RB_SET_BIT(1),
-	VERTEX_SHADER_INVOCATIONS = RB_SET_BIT(2),
-	GEOMETRY_SHADER_INVOCATIONS = RB_SET_BIT(3),
-	GEOMETRY_SHADER_PRIMITIVES = RB_SET_BIT(4),
-	CLIPPING_INVOCATIONS = RB_SET_BIT(5),
-	CLIPPING_PRIMITIVES = RB_SET_BIT(6),
-	FRAGMENT_SHADER_INVOCATIONS = RB_SET_BIT(7),
-	TESS_CONTROL_SHADER_PATCHES = RB_SET_BIT(8),
-	TESS_EVALUATION_SHADER_INVOCATIONS = RB_SET_BIT(9),
-	COMPUTE_SHADER_INVOCATIONS = RB_SET_BIT(10)
-};
-RB_ENUM_CLASS_FLAGS(EPipelineStatsBits)
-
 enum class EColorWriteBits : uint8
 {
 	R = RB_SET_BIT(0),
@@ -562,77 +783,14 @@ enum class EColorWriteBits : uint8
 	B = RB_SET_BIT(2),
 	A = RB_SET_BIT(3),
 
-	RGBA = R | G | B | A
+	RGB	 = R | G | B,
+	RGBA = RGB | A
 };
 RB_ENUM_CLASS_FLAGS(EColorWriteBits)
 
-enum class EResourceViewBits : uint8
+union RClearValue
 {
-	READONLY_DEPTH = RB_SET_BIT(0),
-	READONLY_STENCIL = RB_SET_BIT(1)
-};
-RB_ENUM_CLASS_FLAGS(EResourceViewBits)
-
-enum class EFormatSupportBits : uint8
-{
-	UNSUPPORTED = 0,
-	TEXTURE = RB_SET_BIT(0),
-	STORAGE_TEXTURE = RB_SET_BIT(1),
-	BUFFER = RB_SET_BIT(2),
-	STORAGE_BUFFER = RB_SET_BIT(3),
-	COLOR_ATTACHMENT = RB_SET_BIT(4),
-	DEPTH_STENCIL_ATTACHMENT = RB_SET_BIT(5),
-	VERTEX_BUFFER = RB_SET_BIT(6)
-};
-RB_ENUM_CLASS_FLAGS(EFormatSupportBits)
-
-enum class EDescriptorSetBindingBits : uint8
-{
-	DEFAULT = 0,
-	PARTIALLY_BOUND = RB_SET_BIT(0)
-};
-RB_ENUM_CLASS_FLAGS(EDescriptorSetBindingBits)
-
-struct RRect
-{
-	int32 Left;
-	int32 Top;
-	uint32 Width;
-	uint32 Height;
-};
-
-struct RViewport
-{
-	float Offset[2];
-	float Size[2];
-	float DepthRangeMin;
-	float DepthRangeMax;
-};
-
-struct RColor32f
-{
-	float X, Y, Z, W;
-};
-
-struct RColor32ui
-{
-	uint32 X, Y, Z, W;
-};
-
-struct RColor32i
-{
-	int32 X, Y, Z, W;
-};
-
-struct RDepthStencilClearValue
-{
-	float Depth;
-	uint8 Stencil;
-};
-
-union RClearValueDesc
-{
-	RDepthStencilClearValue DepthStencil;
+	RDepthStencil DepthStencil;
 	RColor32f Color32f;
 	RColor32ui Color32ui;
 	RColor32i Color32i;
@@ -640,361 +798,9 @@ union RClearValueDesc
 
 struct RClearDesc
 {
-	RClearValueDesc Value;
+	RClearValue Value;
 	EAttachmentContentType AttachmentContentType;
 	uint32 ColorAttachmentIndex;
-};
-
-struct RClearStorageBufferDesc
-{
-	const RDescriptor* StorageBuffer;
-	uint32 Value;
-	uint32 SetIndexInPipelineLayout;
-	uint32 RangeIndex;
-	uint32 OffsetInRange;
-};
-
-struct RClearStorageTextureDesc
-{
-	const RDescriptor* StorageTexture;
-	RClearValueDesc Value;
-	uint32 SetIndexInPipelineLayout;
-	uint32 RangeIndex;
-	uint32 OffsetInRange;
-};
-
-struct RTextureRegionDesc
-{
-	uint16 Offset[3];
-	uint16 Size[3];
-	uint16 MipOffset;
-	uint16 ArrayOffset;
-};
-
-struct RTextureDataLayoutDesc
-{
-	uint64 Offset;
-	uint32 RowPitch;
-	uint32 SlicePitch;
-};
-
-struct RQueueSubmitDesc
-{
-	const RCommandBuffer* const* CommandBuffers;
-	uint32 CommandBufferNum;
-	uint32 PhysicalDeviceIndex;
-};
-
-struct RBufferMemoryBindingDesc
-{
-	RMemory* Memory;
-	RBuffer* Buffer;
-	uint64 Offset;
-	uint32 PhysicalDeviceMask;
-};
-
-struct RTextureMemoryBindingDesc
-{
-	RMemory* Memory;
-	RTexture* Texture;
-	uint64 Offset;
-	uint32 PhysicalDeviceMask;
-};
-
-struct RMemoryDesc
-{
-	uint64 Size;
-	uint32 Alignment;
-	RMemoryType Type;
-	bool bMustBeDedicated;
-};
-
-struct RAddressModes
-{
-	EAddressMode U;
-	EAddressMode V;
-	EAddressMode W;
-};
-
-struct RSamplerDesc
-{
-	EFilter Magnification;
-	EFilter Minification;
-	EFilter Mip;
-	EFilterExt FilterExt;
-	uint32 Anisotropy;
-	float MipBias;
-	float MipMin;
-	float MipMax;
-	RAddressModes AddressModes;
-	ECompareFunc CompareFunc;
-	EBorderColor BorderColor;
-	bool bUnnormalizedCoordinates;
-};
-
-struct RTextureDesc
-{
-	ETextureType Type;
-	ETextureUsageBits UsageMask;
-	EFormat Format;
-	uint16 Size[3];
-	uint16 MipNum;
-	uint16 ArraySize;
-	uint8 SampleNum;
-	uint32 PhysicalDeviceMask;
-};
-
-struct RBufferDesc
-{
-	uint64 Size;
-	uint32 StructureStride;
-	EBufferUsageBits UsageMask;
-	uint32 PhysicalDeviceMask;
-};
-
-struct RTexture1DViewDesc
-{
-	const RTexture* Texture;
-	ETexture1DViewType ViewType;
-	EFormat Format;
-	uint16 MipOffset;
-	uint16 MipNum;
-	uint16 ArrayOffset;
-	uint16 ArraySize;
-	uint32 PhysicalDeviceMask;
-	EResourceViewBits Flags;
-};
-
-struct RTexture2DViewDesc
-{
-	const RTexture* Texture;
-	ETexture2DViewType ViewType;
-	EFormat Format;
-	uint16 MipOffset;
-	uint16 MipNum;
-	uint16 ArrayOffset;
-	uint16 ArraySize;
-	uint32 PhysicalDeviceMask;
-	EResourceViewBits Flags;
-};
-
-struct RTexture3DViewDesc
-{
-	const RTexture* Texture;
-	ETexture3DViewType ViewType;
-	EFormat Format;
-	uint16 MipOffset;
-	uint16 MipNum;
-	uint16 SliceOffset;
-	uint16 SliceNum;
-	uint32 PhysicalDeviceMask;
-	EResourceViewBits Flags;
-};
-
-struct RBufferViewDesc
-{
-	const RBuffer* Buffer;
-	EBufferViewType ViewType;
-	EFormat Format;
-	uint64 Offset;
-	uint64 Size;
-	uint32 PhysicalDeviceMask;
-};
-
-struct RDescriptorPoolDesc
-{
-	uint32 PhysicalDeviceMask;
-	uint32 DescriptorSetMaxNum;
-	uint32 SamplerMaxNum;
-	uint32 ConstantBufferMaxNum;
-	uint32 DynamicConstantBufferMaxNum;
-	uint32 TextureMaxNum;
-	uint32 StorageTextureMaxNum;
-	uint32 BufferMaxNum;
-	uint32 StorageBufferMaxNum;
-	uint32 StructuredBufferMaxNum;
-	uint32 StorageStructuredBufferMaxNum;
-};
-
-struct RTextureTransitionBarrierDesc
-{
-	const RTexture* Texture;
-	uint16 MipOffset;
-	uint16 MipNum;
-	uint16 ArrayOffset;
-	uint16 ArraySize;
-	EAccessBits PrevAccess;
-	EAccessBits NextAccess;
-	ETextureLayout PrevLayout;
-	ETextureLayout NextLayout;
-};
-
-struct RBufferTransitionBarrierDesc
-{
-	const RBuffer* Buffer;
-	EAccessBits PrevAccess;
-	EAccessBits NextAccess;
-};
-
-struct RBufferAliasingBarrierDesc
-{
-	const RBuffer* Before;
-	const RBuffer* After;
-	EAccessBits NextAccess;
-};
-
-struct RTextureAliasingBarrierDesc
-{
-	const RBuffer* Before;
-	const RBuffer* After;
-	EAccessBits NextAccess;
-	ETextureLayout NextLayout;
-};
-
-struct RTransitionBarrierDesc
-{
-	const RBufferTransitionBarrierDesc* Buffers;
-	const RTextureTransitionBarrierDesc* Textures;
-	uint32 BufferNum;
-	uint32 TextureNum;
-};
-
-struct RAliasingBarrierDesc
-{
-	const RBufferAliasingBarrierDesc* Buffers;
-	const RTextureAliasingBarrierDesc* Textures;
-	uint32 BufferNum;
-	uint32 TextureNum;
-};
-
-struct RDescriptorRangeDesc
-{
-	uint32 BaseRegisterIndex;
-	uint32 DescriptorNum;
-	EDescriptorType DescriptorType;
-	EShaderStage Visibility;
-	bool bIsDescriptorNumVariable;
-	bool bIsArray;
-};
-
-struct RDynamicConstantBufferDesc
-{
-	uint32 RegisterIndex;
-	EShaderStage Visibility;
-};
-
-struct RDescriptorSetDesc
-{
-	uint32 RegisterSpace;
-	const RDescriptorRangeDesc* Ranges;
-	uint32 RangeNum;
-	const RDynamicConstantBufferDesc* DynamicConstantBuffers;
-	uint32 DynamicConstantBufferNum;
-	EDescriptorSetBindingBits BindingMask;
-};
-
-struct RDescriptorRangeUpdateDesc
-{
-	const RDescriptor* const* Descriptors;
-	uint32 DescriptorNum;
-	uint32 OffsetInRange;
-};
-
-struct RDescriptorSetCopyDesc
-{
-	const RDescriptorSet* SrcDescriptorSet;
-	uint32 BaseSrcRange;
-	uint32 BaseDstRange;
-	uint32 RangeNum;
-	uint32 BaseSrcDynamicConstantBuffer;
-	uint32 BaseDstDynamicConstantBuffer;
-	uint32 DynamicConstantBufferNum;
-	uint32 PhysicalDeviceMask;
-};
-
-struct RPushConstantDesc
-{
-	uint32 RegisterIndex;
-	uint32 Size;
-	EShaderStage Visibility;
-};
-
-struct RSPIRVBindingOffsets
-{
-	uint32 SamplerOffset;
-	uint32 TextureOffset;
-	uint32 ConstantBufferOffset;
-	uint32 StorageTextureAndBufferOffset;
-};
-
-struct RShaderDesc
-{
-	EShaderStage Stage;
-	const void* Bytecode;
-	uint64 Size;
-	const char* EntryPointName;
-};
-
-struct RVertexAttributeD3D
-{
-	const char* SemanticName;
-	uint32 SemanticIndex;
-};
-
-struct RVertexAttributeVulkan
-{
-	uint32 Location;
-};
-
-struct RVertexAttributeDesc
-{
-	RVertexAttributeD3D D3D;
-	RVertexAttributeVulkan Vulkan;
-	uint32 Offset;
-	EFormat Format;
-	uint16 StreamIndex;
-};
-
-struct RVertexStreamDesc
-{
-	uint32 Stride;
-	uint16 BindingSlot;
-	EVertexStreamStepRate StepRate;
-};
-
-struct RInputAssemblyDesc
-{
-	const RVertexAttributeDesc* Attributes;
-	const RVertexStreamDesc* Streams;
-	uint8 AttributeNum;
-	uint8 StreamNum;
-	ETopology Topology;
-	uint8 TessControlPointNum;
-	EPrimitiveRestart PrimitiveRestart;
-};
-
-struct RSamplePosition
-{
-	int8 X;
-	int8 Y;
-};
-
-struct RRasterizationDesc
-{
-	uint32 ViewportNum;
-	int32 DepthBiasConstantFactor;
-	float DepthBiasClamp;
-	float DepthBiasSlopeFactor;
-	EFillMode FillMode;
-	ECullMode CullMode;
-	uint16 SampleMask;
-	uint8 SampleNum;
-	bool bAlphaToCoverage;
-	bool bFrontCounterClockwise;
-	bool bDepthClamp;
-	bool bAntialiasedLines;
-	bool bRasterizerDiscard;
-	bool bConservativeRasterization;
 };
 
 struct RStencilDesc
@@ -1048,24 +854,109 @@ struct ROutputMergerDesc
 	RColor32f BlendConsts;
 };
 
-struct RPipelineLayoutDesc
+struct RAttachmentsDesc
 {
-	const RDescriptorSetDesc* DescriptorSets;
-	const RPushConstantDesc* PushConstants;
-	uint32 DescriptorSetNum;
-	uint32 PushConstantNum;
-	EPipelineLayoutShaderStageBits StageMask;
-	bool bIgnoreGlobalSPIRVOffsets;
+	const RDescriptor* DepthStencil;
+	const RDescriptor* const* Colors;
+	uint32 ColorNum;
+};
+
+#pragma endregion
+
+//===============================================================================================================================
+// Sampler
+//===============================================================================================================================
+#pragma region [ Sampler ]
+
+enum class EBorderColor : uint8
+{
+	FLOAT_TRANSPARENT_BLACK,
+	FLOAT_OPAQUE_BLACK,
+	FLOAT_OPAQUE_WHITE,
+	INT_TRANSPARENT_BLACK,
+	INT_OPAQUE_BLACK,
+	INT_OPAQUE_WHITE,
+
+	MAX_NUM
+};
+
+enum class EFilter : uint8
+{
+	NEAREST,
+	LINEAR,
+
+	MAX_NUM
+};
+
+enum class EFilterExt : uint8
+{
+	NONE,
+	MIN,
+	MAX,
+
+	MAX_NUM
+};
+
+enum class EAddressMode : uint8
+{
+	REPEAT,
+	MIRRORED_REPEAT,
+	CLAMP_TO_EDGE,
+	CLAMP_TO_BORDER,
+
+	MAX_NUM
+};
+
+struct RAddressModes
+{
+	EAddressMode U;
+	EAddressMode V;
+	EAddressMode W;
+};
+
+struct RFilters
+{
+	EFilter Min, Mag, Mip;
+	EFilterExt Ext;
+};
+
+struct RSamplerDesc
+{
+	RFilters Filters;
+	uint8 Anisotropy;
+	float MipBias;
+	float MipMin;
+	float MipMax;
+	RAddressModes AddressModes;
+	ECompareFunc CompareFunc;
+	EBorderColor BorderColor;
+};
+
+#pragma endregion
+
+//===============================================================================================================================
+// Pipeline
+//===============================================================================================================================
+#pragma region [ Pipeline ]
+
+struct RShaderDesc
+{
+	EStageBits Stage;
+	const void* Bytecode;
+	uint64 Size;
+	const char* EntryPointName;
 };
 
 struct RGraphicsPipelineDesc
 {
 	const RPipelineLayout* PipelineLayout;
-	const RInputAssemblyDesc* InputAssembly;
-	const RRasterizationDesc* Rasterization;
-	const ROutputMergerDesc* OutputMerger;
-	const RShaderDesc* ShaderStages;
-	uint32 ShaderStageNum;
+	const RVertexInputDesc* VertexInput; // optional
+	RInputAssemblyDesc InputAssembly;
+	RRasterizationDesc Rasterization;
+	const RMultisampleDesc* Multisample; // optional
+	ROutputMergerDesc OutputMerger;
+	const RShaderDesc* Shaders;
+	uint32 ShaderNum;
 };
 
 struct RComputePipelineDesc
@@ -1074,46 +965,292 @@ struct RComputePipelineDesc
 	RShaderDesc ComputeShader;
 };
 
-struct RFrameBufferDesc
+#pragma endregion
+
+//===============================================================================================================================
+// Barrier
+//===============================================================================================================================
+#pragma region [ Barrier ]
+
+enum class ELayout : uint8
 {
-	const RDescriptor* const* ColorAttachments;
-	const RDescriptor* DepthStencilAttachment;
-	const RClearValueDesc* ColorClearValues;
-	const RClearValueDesc* DepthStencilClearValue;
-	uint32 ColorAttachmentNum;
-	uint32 PhysicalDeviceMask;
-	uint16 Size[2];
-	uint16 LayerNum;
+	UNKNOWN,
+	COLOR_ATTACHMENT,
+	DEPTH_STENCIL,
+	DEPTH_STENCIL_READONLY,
+	SHADER_RESOURCE,
+	SHADER_RESOURCE_STORAGE,
+	COPY_SOURCE,
+	COPY_DESTINATION,
+	PRESENT,
+
+	MAX_NUM
+};
+
+enum class EAccessBits : uint16
+{
+	UNKNOWN = 0,
+	INDEX_BUFFER				 = RB_SET_BIT(0),  // INDEX_INPUT
+	VERTEX_BUFFER				 = RB_SET_BIT(1),  // VERTEX_SHADER
+	CONSTANT_BUFFER				 = RB_SET_BIT(2),  // GRAPHICS_SHADERS, COMPUTE_SHADER, RAY_TRACING_SHADERS
+	SHADER_RESOURCE				 = RB_SET_BIT(3),  // GRAPHICS_SHADERS, COMPUTE_SHADER, RAY_TRACING_SHADERS
+	SHADER_RESOURCE_STORAGE		 = RB_SET_BIT(4),  // GRAPHICS_SHADERS, COMPUTE_SHADER, RAY_TRACING_SHADERS, CLEAR_STORAGE
+	ARGUMENT_BUFFER				 = RB_SET_BIT(5),  // INDIRECT
+	COLOR_ATTACHMENT			 = RB_SET_BIT(6),  // COLOR_ATTACHMENT
+	DEPTH_STENCIL_WRITE			 = RB_SET_BIT(7),  // DEPTH_STENCIL_ATTACHMENT
+	DEPTH_STENCIL_READ			 = RB_SET_BIT(8),  // DEPTH_STENCIL_ATTACHMENT
+	COPY_SOURCE					 = RB_SET_BIT(9),  // COPY
+	COPY_DESTINATION			 = RB_SET_BIT(10), // COPY
+	ACCELERATION_STRUCTURE_READ	 = RB_SET_BIT(11), // COMPUTE_SHADER, RAY_TRACING, ACCELERATION_STRUCTURE
+	ACCELERATION_STRUCTURE_WRITE = RB_SET_BIT(12), // COMPUTE_SHADER, RAY_TRACING, ACCELERATION_STRUCTURE
+	SHADING_RATE				 = RB_SET_BIT(13)  // FRAGMENT_SHADER // TODO: WIP
+};
+RB_ENUM_CLASS_FLAGS(EAccessBits)
+
+struct RAccessStage
+{
+	EAccessBits Access;
+	EStageBits Stages;
+};
+
+struct RAccessLayoutStage
+{
+	EAccessBits Access;
+	ELayout Layout;
+	EStageBits Stages;
+};
+
+struct RGlobalBarrierDesc
+{
+	RAccessStage Before;
+	RAccessStage After;
+};
+
+struct RBufferBarrierDesc
+{
+	RBuffer* Buffer;
+	RAccessStage Before;
+	RAccessStage After;
+};
+
+struct RTextureBarrierDesc
+{
+	RTexture* Texture;
+	RAccessLayoutStage Before;
+	RAccessLayoutStage After;
+	Mip_t MipOffset;
+	Mip_t MipNum;
+	Dim_t ArrayOffset;
+	Dim_t ArraySize;
+};
+
+struct RBarrierGroupDesc
+{
+	const RGlobalBarrierDesc* Globals;
+	const RBufferBarrierDesc* Buffers;
+	const RTextureBarrierDesc* Textures;
+	uint16 GlobalNum;
+	uint16 BufferNum;
+	uint16 TextureNum;
+};
+
+#pragma endregion
+
+//===============================================================================================================================
+// Other
+//===============================================================================================================================
+#pragma region [ Other ]
+
+struct RTextureRegionDesc
+{
+	uint16 X, Y, Z;
+	Dim_t Width;
+	Dim_t Height;
+	Dim_t Depth;
+	Mip_t MipOffset;
+	Dim_t ArrayOffset;
+};
+
+struct RTextureDataLayoutDesc
+{
+	uint64 Offset;
+	uint32 RowPitch;
+	uint32 SlicePitch;
+};
+
+// Work submission
+struct RFenceSubmitDesc
+{
+	RFence* Fence;
+	uint64 Value;
+	EStageBits Stages;
+};
+
+struct RQueueSubmitDesc
+{
+	const RFenceSubmitDesc* WaitFences;
+	uint32 WaitFenceNum;
+	const RCommandBuffer* const* CommandBuffers;
+	uint32 CommandBufferNum;
+	const RFenceSubmitDesc* SignalFences;
+	uint32 SignalFenceNum;
+};
+
+struct RBufferMemoryBindingDesc
+{
+	RMemory* Memory;
+	RBuffer* Buffer;
+	uint64 Offset;
+};
+
+struct RTextureMemoryBindingDesc
+{
+	RMemory* Memory;
+	RTexture* Texture;
+	uint64 Offset;
+};
+
+struct RMemoryDesc
+{
+	uint64 Size;
+	uint32 Alignment;
+	uint32 Type;
+	bool bMustBeDedicated;
+};
+
+struct RClearStorageBufferDesc
+{
+	const RDescriptor* StorageBuffer;
+	uint32 Value;
+	uint32 SetIndexInPipelineLayout;
+	uint32 RangeIndex;
+	uint32 OffsetInRange;
+};
+
+struct RClearStorageTextureDesc
+{
+	const RDescriptor* StorageTexture;
+	RClearValue Value;
+	uint32 SetIndexInPipelineLayout;
+	uint32 RangeIndex;
+	uint32 OffsetInRange;
+};
+
+struct RDescriptorRangeUpdateDesc
+{
+	const RDescriptor* const* Descriptors;
+	uint32 DescriptorNum;
+	uint32 OffsetInRange;
+};
+
+struct RDescriptorSetCopyDesc
+{
+	const RDescriptorSet* SrcDescriptorSet;
+	uint32 BaseSrcRange;
+	uint32 BaseDstRange;
+	uint32 RangeNum;
+	uint32 BaseSrcDynamicConstantBuffer;
+	uint32 BaseDstDynamicConstantBuffer;
+	uint32 DynamicConstantBufferNum;
+};
+
+// Command signatures
+struct RDrawDesc
+{
+	uint32 VertexNum;
+	uint32 InstanceNum;
+	uint32 BbaseVertex; // vertex buffer offset = CmdSetVertexBuffers.offset + baseVertex * VertexStreamDesc::stride
+	uint32 BaseInstance;
+};
+
+struct RDrawIndexedDesc
+{
+	uint32 IndexNum;
+	uint32 InstanceNum;
+	uint32 BaseIndex; // index buffer offset = CmdSetIndexBuffer.offset + baseIndex * sizeof(CmdSetIndexBuffer.indexType)
+	int32 BaseVertex; // index += baseVertex
+	uint32 BaseInstance;
+};
+
+struct RDispatchDesc
+{
+	uint32 X;
+	uint32 Y;
+	uint32 Z;
+};
+
+#pragma endregion
+
+//===============================================================================================================================
+// Queries
+//===============================================================================================================================
+#pragma region [ Queries ]
+
+
+enum class EQueryType : uint8
+{
+	TIMESTAMP,
+	TIMESTAMP_COPY_QUEUE, // requires "isCopyQueueTimestampSupported"
+	OCCLUSION,
+	PIPELINE_STATISTICS,
+	ACCELERATION_STRUCTURE_COMPACTED_SIZE,
+
+	MAX_NUM
 };
 
 struct RQueryPoolDesc
 {
 	EQueryType QueryType;
 	uint32 Capacity;
-	EPipelineStatsBits PipelineStatsMask;
-	uint32 PhysicalDeviceMask;
 };
 
+// Data layout for QueryType::PIPELINE_STATISTICS
+// Never used, only describes the data layout for various cases
 struct RPipelineStatisticsDesc
 {
-	uint64 InputVertices;
-	uint64 InputPrimitives;
-	uint64 VertexShaderInvocations;
-	uint64 GeometryShaderInvocations;
-	uint64 GeometryShaderPrimitives;
-	uint64 RasterizerInPrimitives;
-	uint64 RasterizerOutPrimitives;
-	uint64 FragmentShaderInvocations;
-	uint64 TessControlInvocations;
-	uint64 TessEvaluationInvocations;
-	uint64 ComputeShaderInvocations;
+	// Common part
+	uint64 InputVertexNum;
+	uint64 InputPrimitiveNum;
+	uint64 VertexShaderInvocationNum;
+	uint64 GeometryShaderInvocationNum;
+	uint64 GeometryShaderPrimitiveNum;
+	uint64 RasterizerInPrimitiveNum;
+	uint64 RasterizerOutPrimitiveNum;
+	uint64 FragmentShaderInvocationNum;
+	uint64 TessControlShaderInvocationNum;
+	uint64 TessEvaluationShaderInvocationNum;
+	uint64 ComputeShaderInvocationNum;
+
+	// If "isMeshShaderPipelineStatsSupported"
+	uint64 MeshControlShaderInvocationNum;
+	uint64 MeshEvaluationShaderInvocationNum;
+
+	// If "isMeshShaderPipelineStatsSupported" and D3D12
+	uint64 MeshEvaluationShaderPrimitiveNum;
+};
+
+#pragma endregion
+
+//===============================================================================================================================
+// Device desc
+//===============================================================================================================================
+#pragma region [ Device desc ]
+
+struct RAdapterDesc
+{
+	char Description[128];
+	uint64 LUID;
+	uint64 VideoMemorySize;
+	uint64 SystemMemorySize;
+	uint32 DeviceId;
+	EVendor Vendor;
 };
 
 struct RDeviceDesc
 {
 	// Common
+	RAdapterDesc AdapterDesc;
 	EGraphicsAPI GraphicsAPI;
-	EVendor Vendor;
 	uint16 VersionMajor;
 	uint16 VersionMinor;
 
@@ -1122,30 +1259,31 @@ struct RDeviceDesc
 	uint32 ViewportSubPixelBits;
 	int32 ViewportBoundsRange[2];
 
-	// Framebuffer
-	uint32 FrameBufferMaxDim;
-	uint32 FrameBufferLayerMaxNum;
-	uint32 FramebufferColorAttachmentMaxNum;
+	// Attachments
+	Dim_t AttachmentMaxDim;
+	Dim_t AttachmentLayerMaxNum;
+	Dim_t ColorAttachmentMaxNum;
 
 	// Multi-sampling
-	uint8 FrameBufferColorSampleMaxNum;
-	uint8 FrameBufferDepthSampleMaxNum;
-	uint8 FrameBufferStencilSampleMaxNum;
-	uint8 FrameBufferNoAttachmentsSampleMaxNum;
-	uint8 TextureColorSampleMaxNum;
-	uint8 TextureIntegerSampleMaxNum;
-	uint8 TextureDepthSampleMaxNum;
-	uint8 TextureStencilSampleMaxNum;
-	uint8 StorageTextureSampleMaxNum;
+	Sample_t ColorSampleMaxNum;
+	Sample_t DepthSampleMaxNum;
+	Sample_t StencilSampleMaxNum;
+	Sample_t ZeroAttachmentsSampleMaxNum;
+	Sample_t TextureColorSampleMaxNum;
+	Sample_t TextureIntegerSampleMaxNum;
+	Sample_t TextureDepthSampleMaxNum;
+	Sample_t TextureStencilSampleMaxNum;
+	Sample_t StorageTextureSampleMaxNum;
 
 	// Resource dimensions
-	uint32 Texture1DMaxDim;
-	uint32 Texture2DMaxDim;
-	uint32 Texture3DMaxDim;
-	uint32 TextureArrayMaxDim;
+	Dim_t Texture1DMaxDim;
+	Dim_t Texture2DMaxDim;
+	Dim_t Texture3DMaxDim;
+	Dim_t TextureArrayMaxDim;
 	uint32 TexelBufferMaxDim;
 
 	// Memory
+	uint64 DeviceUploadHeapSize; // ReBAR
 	uint32 MemoryAllocationMaxNum;
 	uint32 SamplerAllocationMaxNum;
 	uint32 UploadBufferTextureRowAlignment;
@@ -1169,26 +1307,24 @@ struct RDeviceDesc
 	uint32 PerStageResourceMaxNum;
 
 	// Descriptor set
-	uint32 DescriptorSetSamplerMaxNum;
-	uint32 DescriptorSetConstantBufferMaxNum;
-	uint32 DescriptorSetStorageBufferMaxNum;
-	uint32 DescriptorSetTextureMaxNum;
-	uint32 DescriptorSetStorageTextureMaxNum;
+	uint32_t descriptorSetSamplerMaxNum;
+	uint32_t descriptorSetConstantBufferMaxNum;
+	uint32_t descriptorSetStorageBufferMaxNum;
+	uint32_t descriptorSetTextureMaxNum;
+	uint32_t descriptorSetStorageTextureMaxNum;
 
 	// Vertex shader
 	uint32 VertexShaderAttributeMaxNum;
 	uint32 VertexShaderStreamMaxNum;
 	uint32 VertexShaderOutputComponentMaxNum;
 
-	// Tessellation control shader
+	// Tessellation shaders
 	float TessControlShaderGenerationMaxLevel;
 	uint32 TessControlShaderPatchPointMaxNum;
 	uint32 TessControlShaderPerVertexInputComponentMaxNum;
 	uint32 TessControlShaderPerVertexOutputComponentMaxNum;
 	uint32 TessControlShaderPerPatchOutputComponentMaxNum;
 	uint32 TessControlShaderTotalOutputComponentMaxNum;
-
-	// Tessellation evaluation shader
 	uint32 TessEvaluationShaderInputComponentMaxNum;
 	uint32 TessEvaluationShaderOutputComponentMaxNum;
 
@@ -1211,6 +1347,23 @@ struct RDeviceDesc
 	uint32 ComputeShaderWorkGroupInvocationMaxNum;
 	uint32 ComputeShaderWorkGroupMaxDim[3];
 
+	// Ray tracing
+	uint64 RayTracingShaderGroupIdentifierSize;
+	uint64 RayTracingShaderTableAligment;
+	uint64 RayTracingShaderTableMaxStride;
+	uint32 RayTracingShaderRecursionMaxDepth;
+	uint32 RayTracingGeometryObjectMaxNum;
+
+	// Mesh shaders
+	uint32 MeshControlSharedMemoryMaxSize;
+	uint32 MeshControlWorkGroupInvocationMaxNum;
+	uint32 MeshControlPayloadMaxSize;
+	uint32 MeshEvaluationOutputVerticesMaxNum;
+	uint32 MeshEvaluationOutputPrimitiveMaxNum;
+	uint32 MeshEvaluationOutputComponentMaxNum;
+	uint32 MeshEvaluationSharedMemoryMaxSize;
+	uint32 MeshEvaluationWorkGroupInvocationMaxNum;
+
 	// Other
 	uint64 TimestampFrequencyHz;
 	uint32 SubPixelPrecisionBits;
@@ -1230,20 +1383,30 @@ struct RDeviceDesc
 	uint32 CullDistanceMaxNum;
 	uint32 CombinedClipAndCullDistanceMaxNum;
 	uint8 ConservativeRasterTier;
-	uint8 PhysicalDeviceNum;
 
-	// Features support
-	bool bIsAPIValidationEnabled;
-	bool bIsTextureFilterMinMaxSupported;
-	bool bIsLogicOpSupported;
-	bool bIsDepthBoundsTestSupported;
-	bool bIsProgrammableSampleLocationsSupported;
-	bool bIsComputeQueueSupported;
-	bool bIsCopyQueueSupported;
-	bool bIsCopyQueueTimestampSupported;
-	bool bIsRegisterAliasingSupported;
-	bool bIsSubsetAllocationSupported;
-	bool bIsFloat16Supported;
+	// Features
+	uint32 IsComputeQueueSupported : 1;
+	uint32 IsCopyQueueSupported : 1;
+	uint32 IsTextureFilterMinMaxSupported : 1;
+	uint32 IsLogicOpSupported : 1;
+	uint32 IsDepthBoundsTestSupported : 1;
+	uint32 IsProgrammableSampleLocationsSupported : 1;
+	uint32 IsRegisterAliasingSupported : 1;
+	uint32 IsFloat16Supported : 1;
+	uint32 IsIndependentFrontAndBackStencilReferenceAndMasksSupported : 1;
+	uint32 IsLineSmoothingSupported : 1;
+	uint32 IsCopyQueueTimestampSupported : 1;
+	uint32 IsDispatchRaysIndirectSupported : 1;
+	uint32 IsDrawMeshTasksIndirectSupported : 1;
+	uint32 IsMeshShaderPipelineStatsSupported : 1;
+
+	// Extensions (unexposed are always supported)
+	uint32 IsSwapChainSupported : 1;  // SwapChain
+	uint32 IsRayTracingSupported : 1; // RayTracing
+	uint32 IsMeshShaderSupported : 1; // MeshShader
+	uint32 IsLowLatencySupported : 1; // LowLatency
 };
 
-RB_NAMESPACE_END_EX
+#pragma endregion
+
+RB_NAMESPACE_END

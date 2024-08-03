@@ -14,22 +14,22 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\CoreLibs\Foundation\DynamicLibLinker.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\CoreLibs\Foundation\EnumAsByte.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\CoreLibs\Foundation\EnumClassFlags.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\CoreLibs\Foundation\Exceptions.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\CoreLibs\Foundation\GlobalInstance.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\CoreLibs\Foundation\MathLibs.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\CoreLibs\Foundation\MemoryAllocationBase.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\CoreLibs\Foundation\PlatformDefines.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\CoreLibs\Foundation\Prerequisites.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\CoreLibs\Foundation\StandardHeaders.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\CoreLibs\Foundation\StringBase.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\Code\CoreLibs\Foundation\Types.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\Code\CoreLibs\Foundation\DynamicLibLinker.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\Code\CoreLibs\Foundation\MathLibs.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\Code\CoreLibs\Foundation\StringBase.cpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\Code\CoreLibs\Foundation\DynamicLibLinker.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\Code\CoreLibs\Foundation\EnumAsByte.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\Code\CoreLibs\Foundation\EnumClassFlags.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\Code\CoreLibs\Foundation\Exceptions.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\Code\CoreLibs\Foundation\GlobalInstance.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\Code\CoreLibs\Foundation\MathLibs.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\Code\CoreLibs\Foundation\MemoryAllocationBase.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\Code\CoreLibs\Foundation\PlatformDefines.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\Code\CoreLibs\Foundation\Prerequisites.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\Code\CoreLibs\Foundation\StandardHeaders.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\Code\CoreLibs\Foundation\StringBase.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\Code\CoreLibs\Foundation\Types.h" />
+  </ItemGroup>                                     
+  <ItemGroup>                                      
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\..\Code\CoreLibs\Foundation\DynamicLibLinker.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\..\Code\CoreLibs\Foundation\MathLibs.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\..\Code\CoreLibs\Foundation\StringBase.cpp" />
   </ItemGroup>
 </Project>
